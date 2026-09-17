@@ -12,7 +12,7 @@
         "status": "ok"
       },
       {
-        "nome": "GA-55 VSD",
+        "nome": "N°2 GA-55 VSD",
         "ultima_preventiva": "2026-08-27T00:00:00",
         "hrs_preventiva": 65105,
         "hrs_atual": 65535,
@@ -21,7 +21,7 @@
         "status": "ok"
       },
       {
-        "nome": "GA-55 FF",
+        "nome": "N°3 GA-55 FF",
         "ultima_preventiva": "2026-08-27T00:00:00",
         "hrs_preventiva": 45369,
         "hrs_atual": 45409,
@@ -30,7 +30,7 @@
         "status": "ok"
       },
       {
-        "nome": "GA-45",
+        "nome": "N° GA-45",
         "ultima_preventiva": "2026-05-04T00:00:00",
         "hrs_preventiva": 27429,
         "hrs_atual": 29014,
@@ -39,7 +39,7 @@
         "status": "ok"
       },
       {
-        "nome": "GA-55 VSD FF5",
+        "nome": "N°5 GA-55 VSD FF5",
         "ultima_preventiva": "2026-08-26T00:00:00",
         "hrs_preventiva": 26217,
         "hrs_atual": 26949,
@@ -48,7 +48,7 @@
         "status": "ok"
       },
       {
-        "nome": "GA-55 VSD FF6",
+        "nome": "Nº6 GA-55 VSD FF6",
         "ultima_preventiva": "2025-01-16T00:00:00",
         "hrs_preventiva": 16031,
         "hrs_atual": 26763,
@@ -57,7 +57,7 @@
         "status": "atrasado"
       },
       {
-        "nome": "GA-55 VSD FF7",
+        "nome": "N°7 GA-55 VSD FF7",
         "ultima_preventiva": "2026-08-27T00:00:00",
         "hrs_preventiva": 13111,
         "hrs_atual": 13613,
