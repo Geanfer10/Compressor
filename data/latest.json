@@ -1,0 +1,68 @@
+{
+  "gerado_em": "2026-09-17T19:36:56.998616+00:00",
+  "compressores": [
+    {
+      "nome": "SCHULZ",
+      "ultima_preventiva": "2023-02-17T00:00:00",
+      "hrs_preventiva": 25752,
+      "hrs_atual": 25668,
+      "diferenca": -84,
+      "faltam": 4084,
+      "status": "ok"
+    },
+    {
+      "nome": "GA-55 VSD",
+      "ultima_preventiva": "2026-08-27T00:00:00",
+      "hrs_preventiva": 65105,
+      "hrs_atual": 65535,
+      "diferenca": 430,
+      "faltam": 3570,
+      "status": "ok"
+    },
+    {
+      "nome": "GA-55 FF",
+      "ultima_preventiva": "2026-08-27T00:00:00",
+      "hrs_preventiva": 45369,
+      "hrs_atual": 45409,
+      "diferenca": 40,
+      "faltam": 3960,
+      "status": "ok"
+    },
+    {
+      "nome": "GA-45",
+      "ultima_preventiva": "2026-05-04T00:00:00",
+      "hrs_preventiva": 27429,
+      "hrs_atual": 29014,
+      "diferenca": 1585,
+      "faltam": 2415,
+      "status": "ok"
+    },
+    {
+      "nome": "GA-55 VSD FF5",
+      "ultima_preventiva": "2026-08-26T00:00:00",
+      "hrs_preventiva": 26217,
+      "hrs_atual": 26949,
+      "diferenca": 732,
+      "faltam": 3268,
+      "status": "ok"
+    },
+    {
+      "nome": "GA-55 VSD FF6",
+      "ultima_preventiva": "2025-01-16T00:00:00",
+      "hrs_preventiva": 16031,
+      "hrs_atual": 26763,
+      "diferenca": 10732,
+      "faltam": -6732,
+      "status": "atrasado"
+    },
+    {
+      "nome": "GA-55 VSD FF7",
+      "ultima_preventiva": "2026-08-27T00:00:00",
+      "hrs_preventiva": 13111,
+      "hrs_atual": 13613,
+      "diferenca": 502,
+      "faltam": 3498,
+      "status": "ok"
+    }
+  ]
+}
