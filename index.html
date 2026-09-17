@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Preventivas dos Compressores — Goiás Verde</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
+<style>
+  :root{
+    --brand-green:#1E9350;
+    --brand-green-dark:#166B3B;
+    --bg:#FFFFFF;
+    --surface:#F4F7F5;
+    --text:#181D1A;
+    --text-muted:#5B665F;
+    --border:#E1E8E3;
+    --ok:#1E9350;
+    --ok-bg:#E7F5EC;
+    --warn:#C6790C;
+    --warn-bg:#FBF0DE;
+    --danger:#C23B2E;
+    --danger-bg:#FBE9E6;
+    --unknown:#8A938C;
+    --unknown-bg:#EEF1EE;
+    --chart-bg:#14171A;
+    --chart-grid:rgba(255,255,255,0.08);
+    --chart-text:#E7EAE6;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Space Grotesk', ui-sans-serif, system-ui, -apple-system, sans-serif;
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  .page{ max-width:1120px; margin:0 auto; padding:0 24px 56px; }
+
+  header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:12px;
+    padding:22px 0 18px;
+    border-bottom:3px solid var(--brand-green);
+    margin-bottom:28px;
+  }
+  header .brand{ font-size:0.78rem; font-weight:600; color:var(--brand-green-dark); letter-spacing:0.03em; }
+  header h1{ font-size:1.5rem; font-weight:600; margin:2px 0 0; letter-spacing:-0.01em; }
+  header .updated{ font-size:0.82rem; color:var(--text-muted); text-align:right; }
+  header .updated span{ font-family:'JetBrains Mono', ui-monospace, monospace; color:var(--text); }
+
+  .kpis{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(160px, 1fr));
+    gap:14px;
+    margin-bottom:28px;
+  }
+  .kpi{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:18px 20px;
+  }
+  .kpi .kpi-value{
+    font-family:'JetBrains Mono', ui-monospace, monospace;
+    font-size:2.1rem;
+    font-weight:700;
+    line-height:1;
+  }
+  .kpi .kpi-label{ margin-top:6px; font-size:0.82rem; color:var(--text-muted); }
+  .kpi.kpi-total .kpi-value{ color:var(--text); }
+  .kpi.kpi-ok .kpi-value{ color:var(--ok); }
+  .kpi.kpi-warn .kpi-value{ color:var(--warn); }
+  .kpi.kpi-danger .kpi-value{ color:var(--danger); }
+
+  .chart-panel{
+    background:var(--chart-bg);
+    border-radius:12px;
+    padding:22px 22px 10px;
+    margin-bottom:30px;
+  }
+  .chart-panel h2{
+    color:var(--chart-text);
+    font-size:0.95rem;
+    font-weight:500;
+    margin:0 0 14px;
+  }
+  .chart-wrap{ position:relative; height:280px; }
+
+  h2.section-title{
+    font-size:0.95rem;
+    font-weight:600;
+    margin:0 0 14px;
+    color:var(--text);
+  }
+
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(230px, 1fr));
+    gap:14px;
+  }
+  .card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:10px;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+  }
+  .card-bar{ height:4px; background:var(--unknown); }
+  .card.status-ok .card-bar{ background:var(--ok); }
+  .card.status-atencao .card-bar{ background:var(--warn); }
+  .card.status-atrasado .card-bar{ background:var(--danger); }
+
+  .card-body{ padding:18px; }
+  .status-pill{
+    display:inline-block;
+    font-size:0.72rem;
+    font-weight:600;
+    padding:2px 8px;
+    border-radius:999px;
+    margin-bottom:12px;
+  }
+  .card.status-ok .status-pill{ background:var(--ok-bg); color:var(--ok); }
+  .card.status-atencao .status-pill{ background:var(--warn-bg); color:var(--warn); }
+  .card.status-atrasado .status-pill{ background:var(--danger-bg); color:var(--danger); }
+  .card.status-sem_dados .status-pill{ background:var(--unknown-bg); color:var(--unknown); }
+
+  .card h3{ font-size:1rem; font-weight:600; margin:0 0 12px; }
+  .reading{ display:flex; align-items:baseline; gap:6px; font-family:'JetBrains Mono', ui-monospace, monospace; }
+  .reading-value{ font-size:2rem; font-weight:700; line-height:1; }
+  .reading-unit{ font-size:0.9rem; color:var(--text-muted); }
+  .card.status-ok .reading-value{ color:var(--ok); }
+  .card.status-atencao .reading-value{ color:var(--warn); }
+  .card.status-atrasado .reading-value{ color:var(--danger); }
+  .card.status-sem_dados .reading-value{ color:var(--unknown); }
+  .reading-label{ font-size:0.8rem; color:var(--text-muted); margin:4px 0 14px; }
+
+  .details{ margin:0; padding-top:12px; border-top:1px solid var(--border); display:flex; flex-direction:column; gap:6px; }
+  .details > div{ display:flex; justify-content:space-between; gap:10px; font-size:0.78rem; }
+  .details dt{ color:var(--text-muted); font-weight:400; }
+  .details dd{ margin:0; font-family:'JetBrains Mono', ui-monospace, monospace; }
+
+  footer{ margin-top:36px; color:var(--text-muted); font-size:0.78rem; text-align:center; }
+
+  #error-banner{
+    display:none;
+    background:var(--danger-bg);
+    color:var(--danger);
+    border-radius:8px;
+    padding:14px 18px;
+    font-size:0.88rem;
+    margin-bottom:24px;
+  }
+
+  @media (max-width:560px){
+    header{ flex-direction:column; align-items:flex-start; }
+    header .updated{ text-align:left; }
+  }
+</style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div>
+        <div class="brand">GOIÁS VERDE · PCM</div>
+        <h1>Preventivas dos Compressores</h1>
+      </div>
+      <div class="updated">Atualizado em<br><span id="updated-at">—</span></div>
+    </header>
+
+    <div id="error-banner"></div>
+
+    <div class="kpis">
+      <div class="kpi kpi-total"><div class="kpi-value" id="kpi-total">—</div><div class="kpi-label">Compressores monitorados</div></div>
+      <div class="kpi kpi-ok"><div class="kpi-value" id="kpi-ok">—</div><div class="kpi-label">Em dia</div></div>
+      <div class="kpi kpi-warn"><div class="kpi-value" id="kpi-warn">—</div><div class="kpi-label">Em atenção</div></div>
+      <div class="kpi kpi-danger"><div class="kpi-value" id="kpi-danger">—</div><div class="kpi-label">Atrasados</div></div>
+    </div>
+
+    <div class="chart-panel">
+      <h2>Horas restantes até a próxima preventiva</h2>
+      <div class="chart-wrap"><canvas id="chart"></canvas></div>
+    </div>
+
+    <h2 class="section-title">Detalhe por compressor</h2>
+    <div class="grid" id="cards-grid"></div>
+
+    <footer>Painel automatizado — os dados são gerados sempre que uma nova planilha é enviada em <code>uploads/compressores.xlsx</code>.</footer>
+  </div>
+
+<script>
+(function(){
+  "use strict";
+
+  var REFRESH_MS = 5 * 60 * 1000; // reconfere o JSON a cada 5 minutos, para uso em TV/monitor
+  var chart = null;
+
+  var statusLabel = { ok: 'Em dia', atencao: 'Atenção', atrasado: 'Atrasado', sem_dados: 'Sem dados' };
+  var statusColor = { ok: '#1E9350', atencao: '#C6790C', atrasado: '#C23B2E', sem_dados: '#8A938C' };
+
+  function fmtNum(n){
+    return (n === null || n === undefined || isNaN(n)) ? '—' : Math.round(n).toLocaleString('pt-BR');
+  }
+
+  function fmtDate(iso){
+    if (!iso) return '—';
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) return '—';
+    return d.toLocaleDateString('pt-BR');
+  }
+
+  function showError(msg){
+    var el = document.getElementById('error-banner');
+    el.textContent = msg;
+    el.style.display = 'block';
+  }
+
+  function hideError(){
+    document.getElementById('error-banner').style.display = 'none';
+  }
+
+  function render(payload){
+    var list = (payload.compressores || []).slice();
+
+    var counts = { ok: 0, atencao: 0, atrasado: 0, sem_dados: 0 };
+    list.forEach(function(c){ counts[c.status] = (counts[c.status] || 0) + 1; });
+    document.getElementById('kpi-total').textContent = list.length;
+    document.getElementById('kpi-ok').textContent = counts.ok;
+    document.getElementById('kpi-warn').textContent = counts.atencao;
+    document.getElementById('kpi-danger').textContent = counts.atrasado;
+
+    var updated = payload.gerado_em ? new Date(payload.gerado_em) : null;
+    document.getElementById('updated-at').textContent = updated
+      ? updated.toLocaleString('pt-BR')
+      : '—';
+
+    // ordena do mais urgente para o mais tranquilo
+    list.sort(function(a, b){
+      var an = (a.faltam === null || a.faltam === undefined) ? Infinity : a.faltam;
+      var bn = (b.faltam === null || b.faltam === undefined) ? Infinity : b.faltam;
+      return an - bn;
+    });
+
+    renderChart(list);
+    renderCards(list);
+  }
+
+  function renderChart(list){
+    var ctx = document.getElementById('chart').getContext('2d');
+    var labels = list.map(function(c){ return c.nome; });
+    var data = list.map(function(c){ return c.faltam === null || c.faltam === undefined ? 0 : c.faltam; });
+    var colors = list.map(function(c){ return statusColor[c.status] || statusColor.sem_dados; });
+
+    if (chart) chart.destroy();
+    chart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          data: data,
+          backgroundColor: colors,
+          borderRadius: 4,
+          maxBarThickness: 46
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          datalabels: {
+            color: '#E7EAE6',
+            anchor: 'end',
+            align: function(ctx){ return ctx.dataset.data[ctx.dataIndex] < 0 ? 'start' : 'end'; },
+            font: { family: "'JetBrains Mono', monospace", weight: '600', size: 11 },
+            formatter: function(v){ return Math.round(v).toLocaleString('pt-BR'); }
+          }
+        },
+        scales: {
+          x: {
+            ticks: { color: '#B7BFB9', font: { family: "'Space Grotesk', sans-serif", size: 11 } },
+            grid: { display: false }
+          },
+          y: {
+            ticks: { color: '#B7BFB9', font: { family: "'JetBrains Mono', monospace", size: 11 } },
+            grid: { color: 'rgba(255,255,255,0.08)' }
+          }
+        }
+      },
+      plugins: [ChartDataLabels]
+    });
+  }
+
+  function renderCards(list){
+    var grid = document.getElementById('cards-grid');
+    grid.innerHTML = '';
+    list.forEach(function(item){
+      var status = item.status || 'sem_dados';
+      var label = status === 'atrasado' ? 'horas do prazo' : 'horas para a próxima';
+      var value = (item.faltam === null || item.faltam === undefined) ? '—' : fmtNum(Math.abs(item.faltam));
+
+      var card = document.createElement('article');
+      card.className = 'card status-' + status;
+      card.innerHTML =
+        '<div class="card-bar"></div>' +
+        '<div class="card-body">' +
+          '<span class="status-pill">' + statusLabel[status] + '</span>' +
+          '<h3>' + escapeHtml(item.nome) + '</h3>' +
+          '<div class="reading"><span class="reading-value">' + value + '</span><span class="reading-unit">h</span></div>' +
+          '<p class="reading-label">' + label + '</p>' +
+          '<dl class="details">' +
+            '<div><dt>Última preventiva</dt><dd>' + fmtDate(item.ultima_preventiva) + '</dd></div>' +
+            '<div><dt>Horas na preventiva</dt><dd>' + fmtNum(item.hrs_preventiva) + ' h</dd></div>' +
+            '<div><dt>Horas atuais</dt><dd>' + fmtNum(item.hrs_atual) + ' h</dd></div>' +
+          '</dl>' +
+        '</div>';
+      grid.appendChild(card);
+    });
+  }
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+
+  function load(){
+    fetch('data/latest.json?_=' + Date.now())
+      .then(function(res){
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json();
+      })
+      .then(function(payload){
+        hideError();
+        render(payload);
+      })
+      .catch(function(err){
+        showError('Não consegui carregar data/latest.json. Confira se o pipeline do GitHub Actions já rodou pelo menos uma vez. (' + err.message + ')');
+      });
+  }
+
+  load();
+  setInterval(load, REFRESH_MS);
+})();
+</script>
+</body>
+</html>
