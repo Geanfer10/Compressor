@@ -79,6 +79,7 @@
   .kpi.kpi-ok .kpi-value{ color:var(--ok); }
   .kpi.kpi-warn .kpi-value{ color:var(--warn); }
   .kpi.kpi-danger .kpi-value{ color:var(--danger); }
+  .kpi.kpi-inactive .kpi-value{ color:var(--unknown); }
 
   .chart-panel{
     background:var(--chart-bg);
@@ -118,6 +119,7 @@
   .card.status-ok .card-bar{ background:var(--ok); }
   .card.status-atencao .card-bar{ background:var(--warn); }
   .card.status-atrasado .card-bar{ background:var(--danger); }
+  .card.status-inativo{ opacity:0.75; }
 
   .card-body{ padding:18px; }
   .status-pill{
@@ -132,6 +134,7 @@
   .card.status-atencao .status-pill{ background:var(--warn-bg); color:var(--warn); }
   .card.status-atrasado .status-pill{ background:var(--danger-bg); color:var(--danger); }
   .card.status-sem_dados .status-pill{ background:var(--unknown-bg); color:var(--unknown); }
+  .card.status-inativo .status-pill{ background:var(--unknown-bg); color:var(--unknown); }
 
   .card h3{ font-size:1rem; font-weight:600; margin:0 0 12px; }
   .reading{ display:flex; align-items:baseline; gap:6px; font-family:'JetBrains Mono', ui-monospace, monospace; }
@@ -142,6 +145,7 @@
   .card.status-atrasado .reading-value{ color:var(--danger); }
   .card.status-sem_dados .reading-value{ color:var(--unknown); }
   .reading-label{ font-size:0.8rem; color:var(--text-muted); margin:4px 0 14px; }
+  .reading-note{ font-size:0.85rem; color:var(--text-muted); margin:6px 0 14px; line-height:1.4; }
 
   .details{ margin:0; padding-top:12px; border-top:1px solid var(--border); display:flex; flex-direction:column; gap:6px; }
   .details > div{ display:flex; justify-content:space-between; gap:10px; font-size:0.78rem; }
@@ -183,6 +187,7 @@
       <div class="kpi kpi-ok"><div class="kpi-value" id="kpi-ok">—</div><div class="kpi-label">Em dia</div></div>
       <div class="kpi kpi-warn"><div class="kpi-value" id="kpi-warn">—</div><div class="kpi-label">Em atenção</div></div>
       <div class="kpi kpi-danger"><div class="kpi-value" id="kpi-danger">—</div><div class="kpi-label">Atrasados</div></div>
+      <div class="kpi kpi-inactive"><div class="kpi-value" id="kpi-inactive">—</div><div class="kpi-label">Inativos</div></div>
     </div>
 
     <div class="chart-panel">
@@ -203,8 +208,8 @@
   var REFRESH_MS = 5 * 60 * 1000; // reconfere o JSON a cada 5 minutos, para uso em TV/monitor
   var chart = null;
 
-  var statusLabel = { ok: 'Em dia', atencao: 'Atenção', atrasado: 'Atrasado', sem_dados: 'Sem dados' };
-  var statusColor = { ok: '#1E9350', atencao: '#C6790C', atrasado: '#C23B2E', sem_dados: '#8A938C' };
+  var statusLabel = { ok: 'Em dia', atencao: 'Atenção', atrasado: 'Atrasado', sem_dados: 'Sem dados', inativo: 'Inativo' };
+  var statusColor = { ok: '#1E9350', atencao: '#C6790C', atrasado: '#C23B2E', sem_dados: '#8A938C', inativo: '#8A938C' };
 
   function fmtNum(n){
     return (n === null || n === undefined || isNaN(n)) ? '—' : Math.round(n).toLocaleString('pt-BR');
@@ -215,6 +220,13 @@
     var d = new Date(iso);
     if (isNaN(d.getTime())) return '—';
     return d.toLocaleDateString('pt-BR');
+  }
+
+  function fmtOs(value){
+    var raw = (value === null || value === undefined) ? '' : String(value).trim();
+    if (raw === '') return '—';
+    if (raw.toLowerCase() === 'inativo') return 'Inativo';
+    return '#' + escapeHtml(raw);
   }
 
   function showError(msg){
@@ -230,26 +242,31 @@
   function render(payload){
     var list = (payload.compressores || []).slice();
 
-    var counts = { ok: 0, atencao: 0, atrasado: 0, sem_dados: 0 };
+    var counts = { ok: 0, atencao: 0, atrasado: 0, sem_dados: 0, inativo: 0 };
     list.forEach(function(c){ counts[c.status] = (counts[c.status] || 0) + 1; });
     document.getElementById('kpi-total').textContent = list.length;
     document.getElementById('kpi-ok').textContent = counts.ok;
     document.getElementById('kpi-warn').textContent = counts.atencao;
     document.getElementById('kpi-danger').textContent = counts.atrasado;
+    document.getElementById('kpi-inactive').textContent = counts.inativo;
 
     var updated = payload.gerado_em ? new Date(payload.gerado_em) : null;
     document.getElementById('updated-at').textContent = updated
       ? updated.toLocaleString('pt-BR')
       : '—';
 
-    // ordena do mais urgente para o mais tranquilo
+    // ordena do mais urgente para o mais tranquilo; inativos vao para o final
     list.sort(function(a, b){
+      var aInativo = a.status === 'inativo';
+      var bInativo = b.status === 'inativo';
+      if (aInativo !== bInativo) return aInativo ? 1 : -1;
       var an = (a.faltam === null || a.faltam === undefined) ? Infinity : a.faltam;
       var bn = (b.faltam === null || b.faltam === undefined) ? Infinity : b.faltam;
       return an - bn;
     });
 
-    renderChart(list);
+    // compressores inativos nao entram no grafico de horas restantes
+    renderChart(list.filter(function(c){ return c.status !== 'inativo'; }));
     renderCards(list);
   }
 
@@ -304,8 +321,16 @@
     grid.innerHTML = '';
     list.forEach(function(item){
       var status = item.status || 'sem_dados';
-      var label = status === 'atrasado' ? 'horas do prazo' : 'horas para a próxima';
-      var value = (item.faltam === null || item.faltam === undefined) ? '—' : fmtNum(Math.abs(item.faltam));
+      var readingHtml;
+      if (status === 'inativo'){
+        readingHtml = '<p class="reading-note">Fora de operação — não monitorado para preventiva.</p>';
+      } else {
+        var label = status === 'atrasado' ? 'horas do prazo' : 'horas para a próxima';
+        var value = (item.faltam === null || item.faltam === undefined) ? '—' : fmtNum(Math.abs(item.faltam));
+        readingHtml =
+          '<div class="reading"><span class="reading-value">' + value + '</span><span class="reading-unit">h</span></div>' +
+          '<p class="reading-label">' + label + '</p>';
+      }
 
       var card = document.createElement('article');
       card.className = 'card status-' + status;
@@ -314,12 +339,12 @@
         '<div class="card-body">' +
           '<span class="status-pill">' + statusLabel[status] + '</span>' +
           '<h3>' + escapeHtml(item.nome) + '</h3>' +
-          '<div class="reading"><span class="reading-value">' + value + '</span><span class="reading-unit">h</span></div>' +
-          '<p class="reading-label">' + label + '</p>' +
+          readingHtml +
           '<dl class="details">' +
             '<div><dt>Última preventiva</dt><dd>' + fmtDate(item.ultima_preventiva) + '</dd></div>' +
             '<div><dt>Horas na preventiva</dt><dd>' + fmtNum(item.hrs_preventiva) + ' h</dd></div>' +
             '<div><dt>Horas atuais</dt><dd>' + fmtNum(item.hrs_atual) + ' h</dd></div>' +
+            '<div><dt>Ordem de serviço</dt><dd>' + fmtOs(item.ordem_servico) + '</dd></div>' +
           '</dl>' +
         '</div>';
       grid.appendChild(card);
