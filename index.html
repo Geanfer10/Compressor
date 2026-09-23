@@ -275,6 +275,7 @@
     var labels = list.map(function(c){ return c.nome; });
     var data = list.map(function(c){ return c.faltam === null || c.faltam === undefined ? 0 : c.faltam; });
     var colors = list.map(function(c){ return statusColor[c.status] || statusColor.sem_dados; });
+    var maxVal = Math.max.apply(null, data.concat([0]));
 
     if (chart) chart.destroy();
     chart = new Chart(ctx, {
@@ -291,9 +292,13 @@
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        layout: {
+          padding: { top: 24 } // espaco para o rotulo da barra mais alta nao ser cortado
+        },
         plugins: {
           legend: { display: false },
           datalabels: {
+            clamp: true, // mantem o rotulo dentro da area do grafico mesmo quando a barra chega perto do topo
             color: '#E7EAE6',
             anchor: 'end',
             align: function(ctx){ return ctx.dataset.data[ctx.dataIndex] < 0 ? 'start' : 'end'; },
@@ -307,6 +312,7 @@
             grid: { display: false }
           },
           y: {
+            suggestedMax: maxVal * 1.15, // deixa espaco acima da barra mais alta para o rotulo
             ticks: { color: '#B7BFB9', font: { family: "'JetBrains Mono', monospace", size: 11 } },
             grid: { color: 'rgba(255,255,255,0.08)' }
           }
