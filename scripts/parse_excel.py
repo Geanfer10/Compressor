@@ -23,7 +23,12 @@ WARN_THRESHOLD = 1000  # horas restantes iguais ou abaixo disso entram em "atenc
 
 
 def norm(value):
-    return str(value or "").strip().lower()
+    text = str(value or "").strip().lower()
+    # remove acentos (NFD separa a letra do acento; filtramos as marcas combinantes)
+    import unicodedata
+    text = unicodedata.normalize("NFD", text)
+    text = "".join(ch for ch in text if unicodedata.category(ch) != "Mn")
+    return text
 
 
 def find_header(rows):
@@ -49,6 +54,8 @@ def map_columns(header_row):
             cols["diff"] = j
         elif "proxima" in n:
             cols["faltam"] = j
+        elif "ordem" in n and "servi" in n:
+            cols["ordem_servico"] = j
     return cols
 
 
@@ -99,6 +106,16 @@ def main():
         if diff is None and hrs_prev is not None and hrs_atual is not None:
             diff = hrs_atual - hrs_prev
 
+        raw_os = row[cols["ordem_servico"]] if "ordem_servico" in cols else None
+        ordem_servico = None
+        if raw_os is not None and str(raw_os).strip() != "":
+            ordem_servico = raw_os if isinstance(raw_os, (int, float)) else str(raw_os).strip()
+
+        # Um compressor fora de uso e marcado escrevendo "Inativo" na coluna
+        # "Ordem de Servico" da aba Resumo (em vez de um numero de OS). Isso
+        # tira o compressor das contagens de status e do grafico do painel.
+        status = "inativo" if isinstance(ordem_servico, str) and ordem_servico.lower() == "inativo" else status_of(faltam)
+
         compressores.append({
             "nome": str(name).strip(),
             "ultima_preventiva": last_date.isoformat() if hasattr(last_date, "isoformat") else None,
@@ -106,7 +123,8 @@ def main():
             "hrs_atual": hrs_atual,
             "diferenca": diff,
             "faltam": faltam,
-            "status": status_of(faltam),
+            "status": status,
+            "ordem_servico": ordem_servico,
         })
 
     now = datetime.now(timezone.utc)
