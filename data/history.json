@@ -145,7 +145,8 @@
         "hrs_atual": 25668,
         "diferenca": -84,
         "faltam": 4084,
-        "status": "ok"
+        "status": "inativo",
+        "ordem_servico": "Inativo"
       },
       {
         "nome": "N°2 GA-55 VSD",
@@ -154,7 +155,8 @@
         "hrs_atual": 65535,
         "diferenca": 430,
         "faltam": 3570,
-        "status": "ok"
+        "status": "ok",
+        "ordem_servico": 2994
       },
       {
         "nome": "N°3 GA-55 FF",
@@ -163,7 +165,8 @@
         "hrs_atual": 45409,
         "diferenca": 40,
         "faltam": 3960,
-        "status": "ok"
+        "status": "ok",
+        "ordem_servico": 2696
       },
       {
         "nome": "N°4 GA-45",
@@ -172,7 +175,8 @@
         "hrs_atual": 29014,
         "diferenca": 1585,
         "faltam": 2415,
-        "status": "ok"
+        "status": "ok",
+        "ordem_servico": 2787
       },
       {
         "nome": "N°5 GA-55 VSD FF5",
@@ -181,7 +185,8 @@
         "hrs_atual": 26949,
         "diferenca": 1305,
         "faltam": 2695,
-        "status": "ok"
+        "status": "ok",
+        "ordem_servico": 2914
       },
       {
         "nome": "Nº6 GA-55 VSD FF6",
@@ -190,7 +195,8 @@
         "hrs_atual": 26763,
         "diferenca": 546,
         "faltam": 3454,
-        "status": "ok"
+        "status": "ok",
+        "ordem_servico": 2993
       },
       {
         "nome": "N°7 GA-55 VSD FF7",
@@ -199,7 +205,8 @@
         "hrs_atual": 13613,
         "diferenca": 502,
         "faltam": 3498,
-        "status": "ok"
+        "status": "ok",
+        "ordem_servico": 2995
       }
     ]
   }
