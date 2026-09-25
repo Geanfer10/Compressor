@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-09-25T11:56:56.595547+00:00",
+  "gerado_em": "2026-09-25T13:24:19.045888+00:00",
   "compressores": [
     {
       "nome": "SCHULZ",
@@ -35,9 +35,9 @@
       "nome": "N°4 GA-45",
       "ultima_preventiva": "2026-05-04T00:00:00",
       "hrs_preventiva": 27429,
-      "hrs_atual": 29014,
-      "diferenca": 1585,
-      "faltam": 2415,
+      "hrs_atual": 29033,
+      "diferenca": 1604,
+      "faltam": 2396,
       "status": "ok",
       "ordem_servico": 2787
     },
