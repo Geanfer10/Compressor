@@ -19,7 +19,7 @@ import openpyxl
 
 EXCEL_PATH = "uploads/compressores.xlsx"
 DATA_DIR = "data"
-WARN_THRESHOLD = 1000  # horas restantes iguais ou abaixo disso entram em "atencao"
+WARN_THRESHOLD = 500  # horas restantes iguais ou abaixo disso entram em "atencao"
 
 
 def norm(value):
