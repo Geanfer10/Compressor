@@ -65,9 +65,15 @@
   .kpi{
     background:var(--surface);
     border:1px solid var(--border);
+    border-left:4px solid var(--border);
     border-radius:10px;
     padding:18px 20px;
   }
+  .kpi.kpi-total{ border-left-color:var(--text-muted); }
+  .kpi.kpi-ok{ border-left-color:var(--ok); }
+  .kpi.kpi-warn{ border-left-color:var(--warn); }
+  .kpi.kpi-danger{ border-left-color:var(--danger); }
+  .kpi.kpi-inactive{ border-left-color:var(--unknown); }
   .kpi .kpi-label{
     font-size:0.72rem;
     font-weight:700;
