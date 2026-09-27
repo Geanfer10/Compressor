@@ -118,8 +118,13 @@
   .card-bar{ height:4px; background:var(--unknown); }
   .card.status-ok .card-bar{ background:var(--ok); }
   .card.status-atencao .card-bar{ background:var(--warn); }
-  .card.status-atrasado .card-bar{ background:var(--danger); }
+  .card.status-atrasado .card-bar{ background:var(--danger); animation:bar-pulse 1.6s ease-in-out infinite; }
   .card.status-inativo{ opacity:0.75; }
+
+  @keyframes bar-pulse{
+    0%,100%{ opacity:1; }
+    50%{ opacity:0.35; }
+  }
 
   .card-body{ padding:18px; }
   .status-pill{
@@ -162,6 +167,33 @@
     padding:14px 18px;
     font-size:0.88rem;
     margin-bottom:24px;
+  }
+
+  .alert-banner{
+    display:none;
+    align-items:center;
+    gap:10px;
+    background:var(--danger-bg);
+    border:1px solid var(--danger);
+    color:var(--danger);
+    border-radius:10px;
+    padding:14px 18px;
+    margin-bottom:24px;
+    font-size:0.92rem;
+    font-weight:600;
+    animation:alert-pulse 1.8s ease-in-out infinite;
+  }
+  .alert-banner .alert-icon{ font-size:1.15rem; line-height:1; }
+
+  @keyframes alert-pulse{
+    0%,100%{ box-shadow:0 0 0 0 rgba(194,59,46,0.35); }
+    50%{ box-shadow:0 0 0 8px rgba(194,59,46,0); }
+  }
+
+  .kpi.kpi-danger.has-alert .kpi-value{ animation:kpi-pulse 1.6s ease-in-out infinite; }
+  @keyframes kpi-pulse{
+    0%,100%{ opacity:1; }
+    50%{ opacity:0.45; }
   }
 
   @media (max-width:560px){
@@ -208,6 +240,9 @@
   @media (prefers-reduced-motion: reduce){
     .ticker-track{ animation:none !important; }
     .ticker-bar{ overflow-x:auto; }
+    .alert-banner{ animation:none !important; }
+    .card.status-atrasado .card-bar{ animation:none !important; }
+    .kpi.kpi-danger.has-alert .kpi-value{ animation:none !important; }
   }
 </style>
 </head>
@@ -225,6 +260,11 @@
       <div class="updated">Atualizado em<br><span id="updated-at">—</span></div>
     </header>
 
+    <div id="alert-banner" class="alert-banner" role="alert">
+      <span class="alert-icon">⚠</span>
+      <span id="alert-text"></span>
+    </div>
+
     <div id="error-banner"></div>
 
     <div class="kpis">
@@ -240,6 +280,11 @@
       <div class="chart-wrap"><canvas id="chart"></canvas></div>
     </div>
 
+    <div class="chart-panel" id="history-panel" style="display:none;">
+      <h2>Histórico — horas restantes ao longo do tempo</h2>
+      <div class="chart-wrap"><canvas id="history-chart"></canvas></div>
+    </div>
+
     <h2 class="section-title">Detalhe por compressor</h2>
     <div class="grid" id="cards-grid"></div>
 
@@ -252,6 +297,8 @@
 
   var REFRESH_MS = 5 * 60 * 1000; // reconfere o JSON a cada 5 minutos, para uso em TV/monitor
   var chart = null;
+  var historyChart = null;
+  var HISTORY_PALETTE = ['#1E9350', '#2E6F9E', '#C6790C', '#8E44AD', '#C23B2E', '#1F9E9E', '#8A938C', '#B08900'];
 
   var statusLabel = { ok: 'Em dia', atencao: 'Atenção', atrasado: 'Atrasado', sem_dados: 'Sem dados', inativo: 'Inativo' };
   var statusColor = { ok: '#1E9350', atencao: '#C6790C', atrasado: '#C23B2E', sem_dados: '#8A938C', inativo: '#8A938C' };
@@ -314,6 +361,29 @@
     renderChart(list.filter(function(c){ return c.status !== 'inativo'; }));
     renderCards(list);
     renderTicker(list);
+    renderAlert(list, counts);
+  }
+
+  function renderAlert(list, counts){
+    var banner = document.getElementById('alert-banner');
+    var kpiDanger = document.getElementById('kpi-danger').closest('.kpi');
+    var atrasados = list.filter(function(c){ return c.status === 'atrasado'; });
+
+    kpiDanger.classList.toggle('has-alert', atrasados.length > 0);
+
+    if (!atrasados.length){
+      banner.style.display = 'none';
+      return;
+    }
+
+    var parts = atrasados.map(function(c){
+      var h = (c.faltam === null || c.faltam === undefined) ? '—' : fmtNum(Math.abs(c.faltam));
+      return c.nome + ' (' + h + 'h do prazo)';
+    });
+    var label = atrasados.length === 1 ? 'compressor atrasado' : 'compressores atrasados';
+    document.getElementById('alert-text').textContent =
+      atrasados.length + ' ' + label + ': ' + parts.join(' · ');
+    banner.style.display = 'flex';
   }
 
   function renderTicker(list){
@@ -408,6 +478,90 @@
     });
   }
 
+  function renderHistoryChart(history){
+    var panel = document.getElementById('history-panel');
+    history = (history || []).slice().sort(function(a, b){
+      return a.data < b.data ? -1 : (a.data > b.data ? 1 : 0);
+    });
+    history = history.slice(-60); // ultimos ~60 registros, senao o grafico fica poluido
+
+    if (history.length < 2){
+      panel.style.display = 'none';
+      return;
+    }
+
+    var labels = history.map(function(h){
+      var d = new Date(h.data + 'T00:00:00');
+      return isNaN(d.getTime()) ? h.data : d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+    });
+
+    // mantem a ordem (e a cor) dos compressores estavel, usando o registro mais recente como base
+    var allNames = (history[history.length - 1].compressores || []).map(function(c){ return c.nome; });
+    history.forEach(function(h){
+      (h.compressores || []).forEach(function(c){
+        if (allNames.indexOf(c.nome) === -1) allNames.push(c.nome);
+      });
+    });
+
+    var datasets = allNames.map(function(name, idx){
+      var data = history.map(function(h){
+        var entry = (h.compressores || []).filter(function(c){ return c.nome === name; })[0];
+        if (!entry || entry.status === 'inativo') return null;
+        return (entry.faltam === null || entry.faltam === undefined) ? null : entry.faltam;
+      });
+      var color = HISTORY_PALETTE[idx % HISTORY_PALETTE.length];
+      return {
+        label: name,
+        data: data,
+        borderColor: color,
+        backgroundColor: color,
+        spanGaps: true,
+        tension: 0.25,
+        pointRadius: 2,
+        borderWidth: 2
+      };
+    }).filter(function(ds){
+      return ds.data.some(function(v){ return v !== null; }); // esconde series sem nenhum dado (ex.: sempre inativo)
+    });
+
+    if (!datasets.length){
+      panel.style.display = 'none';
+      return;
+    }
+
+    panel.style.display = 'block';
+
+    if (historyChart) historyChart.destroy();
+    var ctx = document.getElementById('history-chart').getContext('2d');
+    historyChart = new Chart(ctx, {
+      type: 'line',
+      data: { labels: labels, datasets: datasets },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'nearest', intersect: false },
+        plugins: {
+          legend: {
+            display: true,
+            position: 'bottom',
+            labels: { color: '#E7EAE6', font: { family: "'Space Grotesk', sans-serif", size: 11 }, boxWidth: 12 }
+          },
+          datalabels: { display: false }
+        },
+        scales: {
+          x: {
+            ticks: { color: '#B7BFB9', font: { family: "'Space Grotesk', sans-serif", size: 10 }, maxRotation: 0, autoSkip: true },
+            grid: { display: false }
+          },
+          y: {
+            ticks: { color: '#B7BFB9', font: { family: "'JetBrains Mono', monospace", size: 11 } },
+            grid: { color: 'rgba(255,255,255,0.08)' }
+          }
+        }
+      }
+    });
+  }
+
   function renderCards(list){
     var grid = document.getElementById('cards-grid');
     grid.innerHTML = '';
@@ -464,8 +618,27 @@
       });
   }
 
+  function loadHistory(){
+    fetch('data/history.json?_=' + Date.now())
+      .then(function(res){
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json();
+      })
+      .then(function(history){
+        renderHistoryChart(history);
+      })
+      .catch(function(){
+        // historico e um complemento; se ainda nao existir, so escondemos o painel
+        document.getElementById('history-panel').style.display = 'none';
+      });
+  }
+
   load();
-  setInterval(load, REFRESH_MS);
+  loadHistory();
+  setInterval(function(){
+    load();
+    loadHistory();
+  }, REFRESH_MS);
 })();
 </script>
 </body>
