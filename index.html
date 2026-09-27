@@ -168,9 +168,54 @@
     header{ flex-direction:column; align-items:flex-start; }
     header .updated{ text-align:left; }
   }
+
+  .ticker-bar{
+    background:var(--chart-bg);
+    border-bottom:3px solid var(--brand-green);
+    overflow:hidden;
+    padding:10px 0;
+  }
+  .ticker-track{
+    display:inline-flex;
+    align-items:center;
+    white-space:nowrap;
+    animation:ticker-scroll 50s linear infinite;
+  }
+  .ticker-bar:hover .ticker-track{ animation-play-state:paused; }
+  .ticker-track.no-scroll{ animation:none; }
+  .ticker-item{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:0 22px;
+    font-family:'JetBrains Mono', ui-monospace, monospace;
+    font-size:0.82rem;
+    font-weight:600;
+  }
+  .ticker-name{ color:var(--chart-text); font-weight:500; }
+  .ticker-value-ok{ color:var(--ok); }
+  .ticker-value-atencao{ color:var(--warn); }
+  .ticker-value-atrasado{ color:var(--danger); }
+  .ticker-value-sem_dados{ color:var(--unknown); }
+  .ticker-value-inativo{ color:var(--unknown); }
+  .ticker-sep{ color:rgba(231,234,230,0.25); }
+
+  @keyframes ticker-scroll{
+    from{ transform:translateX(0); }
+    to{ transform:translateX(-50%); }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .ticker-track{ animation:none !important; }
+    .ticker-bar{ overflow-x:auto; }
+  }
 </style>
 </head>
 <body>
+  <div class="ticker-bar" id="ticker-bar" aria-hidden="true">
+    <div class="ticker-track" id="ticker-track"></div>
+  </div>
+
   <div class="page">
     <header>
       <div>
@@ -268,6 +313,47 @@
     // compressores inativos nao entram no grafico de horas restantes
     renderChart(list.filter(function(c){ return c.status !== 'inativo'; }));
     renderCards(list);
+    renderTicker(list);
+  }
+
+  function renderTicker(list){
+    var track = document.getElementById('ticker-track');
+    if (!list.length){
+      track.innerHTML = '';
+      return;
+    }
+
+    var itemsHtml = list.map(function(item){
+      var status = item.status || 'sem_dados';
+      var display, valueClass;
+
+      if (status === 'inativo'){
+        display = 'Inativo';
+        valueClass = 'ticker-value-inativo';
+      } else {
+        var val = (item.faltam === null || item.faltam === undefined) ? null : item.faltam;
+        if (val === null){
+          display = '—';
+          valueClass = 'ticker-value-sem_dados';
+        } else {
+          display = (val < 0 ? '-' : '+') + fmtNum(Math.abs(val)) + 'h';
+          valueClass = 'ticker-value-' + status;
+        }
+      }
+
+      return '<span class="ticker-item">' +
+        '<span class="ticker-name">' + escapeHtml(item.nome) + '</span>' +
+        '<span class="' + valueClass + '">' + display + '</span>' +
+      '</span>';
+    }).join('<span class="ticker-sep">•</span>');
+
+    // duplica a faixa para o loop ficar continuo; sem duplicar quando o
+    // visitante prefere menos movimento na tela
+    var reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    track.classList.toggle('no-scroll', reducedMotion);
+    track.innerHTML = reducedMotion
+      ? itemsHtml
+      : itemsHtml + '<span class="ticker-sep">•</span>' + itemsHtml;
   }
 
   function renderChart(list){
