@@ -68,18 +68,25 @@
     border-radius:10px;
     padding:18px 20px;
   }
+  .kpi .kpi-label{
+    font-size:0.72rem;
+    font-weight:700;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    margin-bottom:8px;
+  }
   .kpi .kpi-value{
     font-family:'JetBrains Mono', ui-monospace, monospace;
     font-size:2.1rem;
     font-weight:700;
     line-height:1;
   }
-  .kpi .kpi-label{ margin-top:6px; font-size:0.82rem; color:var(--text-muted); }
-  .kpi.kpi-total .kpi-value{ color:var(--text); }
-  .kpi.kpi-ok .kpi-value{ color:var(--ok); }
-  .kpi.kpi-warn .kpi-value{ color:var(--warn); }
-  .kpi.kpi-danger .kpi-value{ color:var(--danger); }
-  .kpi.kpi-inactive .kpi-value{ color:var(--unknown); }
+  .kpi .kpi-sub{ margin-top:6px; font-size:0.78rem; color:var(--text-muted); }
+  .kpi.kpi-total .kpi-label, .kpi.kpi-total .kpi-value{ color:var(--text); }
+  .kpi.kpi-ok .kpi-label, .kpi.kpi-ok .kpi-value{ color:var(--ok); }
+  .kpi.kpi-warn .kpi-label, .kpi.kpi-warn .kpi-value{ color:var(--warn); }
+  .kpi.kpi-danger .kpi-label, .kpi.kpi-danger .kpi-value{ color:var(--danger); }
+  .kpi.kpi-inactive .kpi-label, .kpi.kpi-inactive .kpi-value{ color:var(--unknown); }
 
   .chart-panel{
     background:var(--chart-bg);
@@ -225,7 +232,6 @@
     white-space:nowrap;
     animation:ticker-scroll 50s linear infinite;
   }
-  .ticker-bar:hover .ticker-track{ animation-play-state:paused; }
   .ticker-track.no-scroll{ animation:none; }
   .ticker-item{
     display:inline-flex;
@@ -281,11 +287,31 @@
     <div id="error-banner"></div>
 
     <div class="kpis">
-      <div class="kpi kpi-total"><div class="kpi-value" id="kpi-total">—</div><div class="kpi-label">Compressores monitorados</div></div>
-      <div class="kpi kpi-ok"><div class="kpi-value" id="kpi-ok">—</div><div class="kpi-label">Em dia</div></div>
-      <div class="kpi kpi-warn"><div class="kpi-value" id="kpi-warn">—</div><div class="kpi-label">Em atenção</div></div>
-      <div class="kpi kpi-danger"><div class="kpi-value" id="kpi-danger">—</div><div class="kpi-label">Atrasados</div></div>
-      <div class="kpi kpi-inactive"><div class="kpi-value" id="kpi-inactive">—</div><div class="kpi-label">Inativos</div></div>
+      <div class="kpi kpi-total">
+        <div class="kpi-label">Total</div>
+        <div class="kpi-value" id="kpi-total">—</div>
+        <div class="kpi-sub">compressores monitorados</div>
+      </div>
+      <div class="kpi kpi-ok">
+        <div class="kpi-label">Em dia</div>
+        <div class="kpi-value" id="kpi-ok">—</div>
+        <div class="kpi-sub" id="kpi-ok-sub">—</div>
+      </div>
+      <div class="kpi kpi-warn">
+        <div class="kpi-label">Atenção</div>
+        <div class="kpi-value" id="kpi-warn">—</div>
+        <div class="kpi-sub" id="kpi-warn-sub">—</div>
+      </div>
+      <div class="kpi kpi-danger">
+        <div class="kpi-label">Atrasado</div>
+        <div class="kpi-value" id="kpi-danger">—</div>
+        <div class="kpi-sub">preventiva vencida</div>
+      </div>
+      <div class="kpi kpi-inactive">
+        <div class="kpi-label">Inativo</div>
+        <div class="kpi-value" id="kpi-inactive">—</div>
+        <div class="kpi-sub">fora de operação</div>
+      </div>
     </div>
 
     <div class="chart-panel">
@@ -347,6 +373,14 @@
     document.getElementById('kpi-warn').textContent = counts.atencao;
     document.getElementById('kpi-danger').textContent = counts.atrasado;
     document.getElementById('kpi-inactive').textContent = counts.inativo;
+
+    // le o criterio direto do JSON (gerado pelo parse_excel.py), assim os
+    // textos abaixo do numero nunca ficam desatualizados se o limite mudar
+    var threshold = (payload.criterio_atencao_horas === null || payload.criterio_atencao_horas === undefined)
+      ? 500
+      : payload.criterio_atencao_horas;
+    document.getElementById('kpi-ok-sub').textContent = '> ' + fmtNum(threshold) + ' h restantes';
+    document.getElementById('kpi-warn-sub').textContent = '≤ ' + fmtNum(threshold) + ' h restantes';
 
     var updated = payload.gerado_em ? new Date(payload.gerado_em) : null;
     document.getElementById('updated-at').textContent = updated
