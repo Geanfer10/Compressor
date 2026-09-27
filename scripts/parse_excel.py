@@ -130,6 +130,7 @@ def main():
     now = datetime.now(timezone.utc)
     payload = {
         "gerado_em": now.isoformat(),
+        "criterio_atencao_horas": WARN_THRESHOLD,
         "compressores": compressores,
     }
 
