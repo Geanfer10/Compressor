@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-09-30T12:50:56.556272+00:00",
+  "gerado_em": "2026-10-09T18:37:56.318541+00:00",
   "criterio_atencao_horas": 500,
   "compressores": [
     {
@@ -16,9 +16,9 @@
       "nome": "N°2 GA-55 VSD",
       "ultima_preventiva": "2026-08-27T00:00:00",
       "hrs_preventiva": 65105,
-      "hrs_atual": 65835,
-      "diferenca": 730,
-      "faltam": 3270,
+      "hrs_atual": 65994,
+      "diferenca": 889,
+      "faltam": 3111,
       "status": "ok",
       "ordem_servico": 2994
     },
@@ -26,9 +26,9 @@
       "nome": "N°3 GA-55 FF",
       "ultima_preventiva": "2026-08-27T00:00:00",
       "hrs_preventiva": 45369,
-      "hrs_atual": 45419,
-      "diferenca": 50,
-      "faltam": 3950,
+      "hrs_atual": 45434,
+      "diferenca": 65,
+      "faltam": 3935,
       "status": "ok",
       "ordem_servico": 2696
     },
@@ -56,9 +56,9 @@
       "nome": "Nº6 GA-55 VSD FF6",
       "ultima_preventiva": "2026-08-26T00:00:00",
       "hrs_preventiva": 26217,
-      "hrs_atual": 27058,
-      "diferenca": 841,
-      "faltam": 3159,
+      "hrs_atual": 27227,
+      "diferenca": 1010,
+      "faltam": 2990,
       "status": "ok",
       "ordem_servico": 2993
     },
@@ -66,9 +66,9 @@
       "nome": "N°7 GA-55 VSD FF7",
       "ultima_preventiva": "2026-08-27T00:00:00",
       "hrs_preventiva": 13111,
-      "hrs_atual": 13920,
-      "diferenca": 809,
-      "faltam": 3191,
+      "hrs_atual": 14008,
+      "diferenca": 897,
+      "faltam": 3103,
       "status": "ok",
       "ordem_servico": 2995
     }
