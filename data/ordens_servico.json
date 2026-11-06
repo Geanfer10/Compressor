@@ -2,8 +2,8 @@
     "2":  {
               "os":  "2994",
               "data_servico":  "2026-08-26",
-              "modelo":  "Compressor",
-              "serie":  "2",
+              "modelo":  "GA55VSDFF",
+              "serie":  null,
               "arquivo":  "O.S. 2994 - Goiás Verde - Compressor 2 GA55VSDFF 26-08-2026.pdf",
               "pasta":  "OS. COMPRESSOR 2",
               "caminho":  "X:\\PCM\\03 - CONTROLES PREVENTIVOS\\06 - COMPRESSORES\\ORDEM DE SERVIÇO\\OS. COMPRESSOR 2\\O.S. 2994 - Goiás Verde - Compressor 2 GA55VSDFF 26-08-2026.pdf"
@@ -11,14 +11,14 @@
     "3":  {
               "os":  "2996",
               "data_servico":  "2026-08-27",
-              "modelo":  "Compressor",
-              "serie":  "3",
+              "modelo":  "GA55FF",
+              "serie":  null,
               "arquivo":  "O.S. 2996 - Goiás Verde - Compressor 3 GA55FF 27-08-2026.pdf",
               "pasta":  "OS. COMPRESSOR 3",
               "caminho":  "X:\\PCM\\03 - CONTROLES PREVENTIVOS\\06 - COMPRESSORES\\ORDEM DE SERVIÇO\\OS. COMPRESSOR 3\\O.S. 2996 - Goiás Verde - Compressor 3 GA55FF 27-08-2026.pdf"
           },
     "4":  {
-              "os":  null,
+              "os":  "2787",
               "data_servico":  "2026-04-30",
               "modelo":  null,
               "serie":  null,
@@ -38,8 +38,8 @@
     "6":  {
               "os":  "2993",
               "data_servico":  null,
-              "modelo":  "Compressor",
-              "serie":  "6",
+              "modelo":  "GA55VSDFF",
+              "serie":  null,
               "arquivo":  "O.S. 2993 - Goiás Verde - Compressor 6 GA55VSDFF.pdf",
               "pasta":  "OS. COMPRESSOR 6",
               "caminho":  "X:\\PCM\\03 - CONTROLES PREVENTIVOS\\06 - COMPRESSORES\\ORDEM DE SERVIÇO\\OS. COMPRESSOR 6\\O.S. 2993 - Goiás Verde - Compressor 6 GA55VSDFF.pdf"
