@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-11-18T17:25:22.234204+00:00",
+  "gerado_em": "2026-11-23T13:55:34.231493+00:00",
   "criterio_atencao_horas": 500,
   "compressores": [
     {
@@ -16,9 +16,9 @@
       "nome": "N°2 GA-55 VSD",
       "ultima_preventiva": "2026-08-27T00:00:00",
       "hrs_preventiva": 65105,
-      "hrs_atual": 66689,
-      "diferenca": 1584,
-      "faltam": 2416,
+      "hrs_atual": 66810,
+      "diferenca": 1705,
+      "faltam": 2295,
       "status": "ok",
       "ordem_servico": 2994
     },
@@ -26,9 +26,9 @@
       "nome": "N°3 GA-55 FF",
       "ultima_preventiva": "2026-08-27T00:00:00",
       "hrs_preventiva": 45369,
-      "hrs_atual": 45456,
-      "diferenca": 87,
-      "faltam": 3913,
+      "hrs_atual": 45457,
+      "diferenca": 88,
+      "faltam": 3912,
       "status": "ok",
       "ordem_servico": 2696
     },
@@ -36,9 +36,9 @@
       "nome": "N°4 GA-45",
       "ultima_preventiva": "2026-05-04T00:00:00",
       "hrs_preventiva": 27429,
-      "hrs_atual": 29528,
-      "diferenca": 2099,
-      "faltam": 1901,
+      "hrs_atual": 29530,
+      "diferenca": 2101,
+      "faltam": 1899,
       "status": "ok",
       "ordem_servico": 2787
     },
@@ -46,9 +46,9 @@
       "nome": "N°5 GA-55 VSD FF5",
       "ultima_preventiva": "2026-07-22T00:00:00",
       "hrs_preventiva": 25644,
-      "hrs_atual": 28211,
-      "diferenca": 2567,
-      "faltam": 1433,
+      "hrs_atual": 28332,
+      "diferenca": 2688,
+      "faltam": 1312,
       "status": "ok",
       "ordem_servico": 2914
     },
@@ -56,9 +56,9 @@
       "nome": "Nº6 GA-55 VSD FF6",
       "ultima_preventiva": "2026-08-26T00:00:00",
       "hrs_preventiva": 26217,
-      "hrs_atual": 28112,
-      "diferenca": 1895,
-      "faltam": 2105,
+      "hrs_atual": 28234,
+      "diferenca": 2017,
+      "faltam": 1983,
       "status": "ok",
       "ordem_servico": 2993
     },
@@ -66,9 +66,9 @@
       "nome": "N°7 GA-55 VSD FF7",
       "ultima_preventiva": "2026-08-27T00:00:00",
       "hrs_preventiva": 13111,
-      "hrs_atual": 14966,
-      "diferenca": 1855,
-      "faltam": 2145,
+      "hrs_atual": 15087,
+      "diferenca": 1976,
+      "faltam": 2024,
       "status": "ok",
       "ordem_servico": 2995
     }
